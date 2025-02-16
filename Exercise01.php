@@ -8,15 +8,16 @@
 <body>
 
 
-
+<?php session_start(); ?>
 
 
     <form action="" method="post">
     <h1>Supermarket management</h1>
-    <p>Worker name: <input type="text" name="workername" id=""></p>
+    <p>Worker name: <input type="text" name="workername" 
+    value="<?php if (isset($_SESSION['nombre'])) { echo htmlspecialchars($_SESSION['nombre']); } ?>"></p>
     <br>
     <h1>Choose product</h1>
-    <select name="product" id="">
+    <select name="product" id="">s
         <option value="softdrink">Soft Drink</option>
         <option value="milk">Milk</option>
     </select>
@@ -33,9 +34,9 @@
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    session_start();
+    
 
-    $nombre = $_POST['workername'];
+    $_SESSION['nombre'] = $_POST['workername'];
     $quantity = $_POST['quantity'];
     $product = $_POST['product'];
 
@@ -51,7 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['add'])){
         $_SESSION['product'][$product] += $quantity;
     } else if(isset($_POST['remove'])){
-        $_SESSION['product'][$product] -= $quantity;
+        if ($quantity > $_SESSION['product'][$product]) {
+            echo '<p>Error! No se puede quitar más unidades de las que hay</p>';
+        } else{
+            $_SESSION['product'][$product] -= $quantity;
+        }
+        
     } else if(isset($_POST['reset'])){
         $_SESSION['product'][$product] = 0;
     }
@@ -59,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo '<h1>Inventary:</h1>';
     echo '</br>';
-    echo '<p>worker: $nombre</p>';
+    echo '<p>worker: ' . $_SESSION['nombre']. '</p>';
     echo '<p>units milk: '.$_SESSION['product']['milk'].'</p>';
     echo '<p>units soft drink: '.$_SESSION['product']['softdrink'].'</p>';
 
